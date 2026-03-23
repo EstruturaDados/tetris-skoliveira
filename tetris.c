@@ -27,8 +27,8 @@ typedef struct {
 void inicializarFila(Fila *f);
 int filaVazia(Fila *f);
 int filaCheia(Fila *f);
-void inserir(Fila *f, Peca p);
-void remover(Fila *f, Peca *p);
+void enqueue(Fila *f, Peca p);
+void dequeue(Fila *f, Peca *p);
 void mostrarFila(Fila *f);
 Peca gerarPeca(int *id);
 
@@ -60,7 +60,7 @@ int main() {
 
     // lotar a fila
     for(int i=0; i<MAX; i++) {
-        inserir(&f, gerarPeca(&id));
+        enqueue(&f, gerarPeca(&id));
     }
 
     int opcao;
@@ -73,11 +73,11 @@ int main() {
         {
         case 1:
             Peca p;
-            remover(&f, &p);
+            dequeue(&f, &p);
             mostrarFila(&f);
             break;
         case 2:
-            inserir(&f, gerarPeca(&id));
+            enqueue(&f, gerarPeca(&id));
             mostrarFila(&f);
             break;
         case 0:
@@ -140,7 +140,7 @@ int filaCheia(Fila *f) {
     return f->total == MAX;
 }
 
-void inserir(Fila *f, Peca p) {
+void enqueue(Fila *f, Peca p) {
     if (filaCheia(f)) {
         printf("Fila cheia. Não é possível inserir.\n");
         return;
@@ -151,7 +151,7 @@ void inserir(Fila *f, Peca p) {
     f->total++;
 }
 
-void remover(Fila *f, Peca *p) {
+void dequeue(Fila *f, Peca *p) {
     if (filaVazia(f)) {
         printf("Fila vazia. Não é possível remover.\n");
         return;
