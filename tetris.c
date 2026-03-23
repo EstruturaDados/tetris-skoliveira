@@ -1,9 +1,39 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 // Desafio Tetris Stack
 // Tema 3 - Integração de Fila e Pilha
 // Este código inicial serve como base para o desenvolvimento do sistema de controle de peças.
 // Use as instruções de cada nível para desenvolver o desafio.
+
+#define MAX 5
+
+// --- Estruturas ---
+
+typedef struct {
+    char tipo;
+    int id;
+} Peca;
+
+typedef struct {
+    Peca pecas[MAX];
+    int inicio;
+    int fim;
+    int total;
+} Fila;
+
+// --- Funções ---
+void inicializarFila(Fila *f);
+int filaVazia(Fila *f);
+int filaCheia(Fila *f);
+void inserir(Fila *f, Peca p);
+void remover(Fila *f, Peca *p);
+void mostrarFila(Fila *f);
+Peca gerarPeca(int *id);
+
+void exibirMenu();
+void limparBufferEntrada();
 
 int main() {
 
@@ -19,7 +49,49 @@ int main() {
     //      0 - Sair
     // - A cada remoção, insira uma nova peça ao final da fila.
 
+    // Inicializa a semente com o tempo atual
+    srand(time(NULL));
 
+    Fila f;
+    inicializarFila(&f);
+
+    // id inicial = zero
+    int id = 0;
+
+    // lotar a fila
+    for(int i=0; i<MAX; i++) {
+        inserir(&f, gerarPeca(&id));
+    }
+
+    int opcao;
+    do{
+        exibirMenu();
+        printf("\nEscolha uma opcao: ");
+        scanf("%d", &opcao);
+        limparBufferEntrada();
+        switch (opcao)
+        {
+        case 1:
+            Peca p;
+            remover(&f, &p);
+            mostrarFila(&f);
+            break;
+        case 2:
+            inserir(&f, gerarPeca(&id));
+            mostrarFila(&f);
+            break;
+        case 0:
+            return 0;
+        
+        default:
+            printf("\nDigite um index valido!");
+            printf("\nPressione Enter para continuar...");
+            getchar();
+            break;
+        }
+    } while(1);
+
+    mostrarFila(&f);
 
     // 🧠 Nível Aventureiro: Adição da Pilha de Reserva
     //
@@ -54,3 +126,70 @@ int main() {
     return 0;
 }
 
+void inicializarFila(Fila *f) {
+    f->inicio = 0;
+    f->fim = 0;
+    f->total = 0;
+}
+
+int filaVazia(Fila *f) {
+    return f->total == 0;
+}
+
+int filaCheia(Fila *f) {
+    return f->total == MAX;
+}
+
+void inserir(Fila *f, Peca p) {
+    if (filaCheia(f)) {
+        printf("Fila cheia. Não é possível inserir.\n");
+        return;
+    }
+ 
+    f->pecas[f->fim] = p;
+    f->fim = (f->fim + 1) % MAX;
+    f->total++;
+}
+
+void remover(Fila *f, Peca *p) {
+    if (filaVazia(f)) {
+        printf("Fila vazia. Não é possível remover.\n");
+        return;
+    }
+
+    *p = f->pecas[f->inicio];             
+    f->inicio = (f->inicio + 1) % MAX;     
+    f->total--;                        
+}
+
+void mostrarFila(Fila *f) {
+    printf("Fila: ");
+    for (int i = 0, idx = f->inicio; i < f->total; i++, idx = (idx + 1) % MAX) {
+        printf("[Peca: %c, id: %d] ", f->pecas[idx].tipo, f->pecas[idx].id);
+    }
+    printf("\n\nPressione Enter para continuar...");
+    getchar();
+}
+
+Peca gerarPeca(int *id) {
+    char tipos[4] = {'I', 'O', 'T', 'L'};
+    char tipo = tipos[rand() % sizeof(tipos)];
+    Peca p;
+    p.tipo = tipo;
+    p.id = *id;
+    *id += 1;
+    return p;
+}
+
+void exibirMenu() {
+    printf("\n1. Jogar peca");
+    printf("\n2. Inserir nova peça");
+    printf("\n0. Sair");
+}
+
+// limparBufferEntrada():
+// Função utilitária para limpar o buffer de entrada do teclado (stdin), evitando problemas com leituras consecutivas de scanf e getchar.
+void limparBufferEntrada() {
+    int c;
+    while((c = getchar()) != '\n' && c != EOF);
+}
